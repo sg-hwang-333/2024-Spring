@@ -1,5 +1,6 @@
 package com.example.mvc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -31,6 +32,26 @@ class User {
         this.email = email;
     }
 }
+
+class ResponseQuote {
+    @JsonProperty("quote")
+    private String quote;
+
+    public String getQuote() {
+        return quote;
+    }
+
+    public void setQuote(String quote) {
+        this.quote = quote;
+    }
+
+    @Override
+    public String toString() {
+        return "quote='" + quote + '\'' +
+                '}';
+    }
+}
+
 
 @RestController
 @RequestMapping("/response_entity_demo")
@@ -110,4 +131,26 @@ public class ResponseEntityDemo {
 
         return responseBody;
     }
+
+    @GetMapping(value="/quote", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseQuote Quote() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        RequestEntity<Void> requestEntity = new RequestEntity<>(
+                null, headers, HttpMethod.GET,
+                URI.create("https://api.kanye.rest/")
+        );
+
+//        ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
+//        String responseBody = response.getBody();
+
+        ResponseEntity<ResponseQuote> response2 = restTemplate.exchange(requestEntity, ResponseQuote.class);
+        ResponseQuote responseBody2 = response2.getBody();
+
+        return responseBody2;
+    }
+
 }
